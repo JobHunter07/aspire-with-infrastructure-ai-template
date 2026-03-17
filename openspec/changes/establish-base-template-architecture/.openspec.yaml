@@ -1,0 +1,5 @@
+name: establish-base-template-architecture
+version: 0.1.0
+summary: Establish Base Template Architecture for Aspire + BFF + Gateway + Keycloak
+authors:
+  - GitHub Copilot

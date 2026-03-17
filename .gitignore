@@ -1,0 +1,109 @@
+################################################################################
+# .gitignore for Aspire (Visual Studio / .NET 10 projects)
+# Keeps generated, user-specific, and tool artifacts out of git to reduce noise
+################################################################################
+
+# Visual Studio / Visual Studio for Mac
+.vs/
+*/.vs
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build folders
+bin/
+obj/
+**/bin/
+**/obj/
+*/bin/*
+*/obj/*
+
+# .NET runtime and publish output
+publish/
+*.Publish.xml
+*.dotCover
+*.nupkg
+*.snupkg
+project.lock.json
+project.assets.json
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+# ReSharper
+_ReSharper*/
+*__ReSharper*/
+
+# NuGet
+packages/
+# NuGet client-local packages
+*.nupkg
+
+# ASP.NET temporary files
+wwwroot/node_modules/
+.publish
+
+# Specific framework output for .NET 10 debug builds
+**/bin/Debug/net10.0/
+**/obj/Debug/net10.0/
+
+# Local secrets and settings
+secrets.json
+local.settings.json
+appsettings.*.Local.json
+
+# Azure / cloud
+.azure/
+azure-pipelines.yml
+*.azuredeploy*
+
+# Node / frontend
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Frontend build outputs
+dist/
+build/
+
+# Logs and test results
+*.log
+logs/
+TestResults/
+*.trx
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Editor folders
+.vscode/
+*.code-workspace
+
+# IDE temporary files
+*.ide?
+
+# Docker
+docker-compose.override.yml
+docker-compose.*.yml
+
+# Certificates and keys
+*.pfx
+*.key
+*.cer
+
+# Temporary files
+tmp/
+temp/
+
+# Misc
+*.bak
+*.backup
+*.old

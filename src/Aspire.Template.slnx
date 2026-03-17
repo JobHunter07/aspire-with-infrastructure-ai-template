@@ -1,7 +1,7 @@
 <Solution>
-  <Project Path="Aspire.Template.AppHost/Aspire.Template.AppHost.csproj" />
-  <Project Path="Aspire.Template.Server/Aspire.Template.Server.csproj" />
-  <Project Path="frontend/frontend.esproj">
+  <Project Path="AppHost/AppHost.csproj" />
+  <Project Path="GatewayHost/GatewayHost.csproj" />
+  <Project Path="FrontEnd/frontend.esproj" DisplayName="FrontEnd">
     <Build />
     <Deploy />
   </Project>

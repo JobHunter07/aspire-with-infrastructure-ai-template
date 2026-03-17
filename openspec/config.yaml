@@ -2,40 +2,46 @@ schema: spec-driven
 
 # Project context: visible to openspec artifact creators and AI
 context: |
-	Tech stack: .NET 10+ (Aspire AppHost), EF Core + PostgreSQL, DBGate, YARP reverse-proxy, React frontend (Vite), Minimal API endpoints.
-	Minimum versions: .NET 10+, Aspire 13+.
-	Package policy: Always prefer the latest stable NuGet package versions at scaffold/implementation time; document exact package versions used in the generated `global.json` and `Directory.Packages.props`.
-	Orchestration: Aspire AppHost manages containers and services (Keycloak, Postgres/DBGate, standalone YARP container, GatewayHost, frontend).
-	Authentication: Keycloak realm with Google OIDC configured; BFF handles token exchange and cookie-based sessions.
-	Reverse proxy: YARP runs as a standalone container managed by the Aspire YARP integration and uses Aspire service-discovery for routes.
-	API conventions: Use Minimal API endpoint classes (one endpoint class per file) organized by feature:
-		Features/<FeatureName>/<Action>/<FeatureAction>Endpoint.cs
-		See examples: https://github.com/JobHunter07/api.jobhunter07.com/blob/master/JobHunter07.API/Features/BookFeature/CreateBook/CreateBookEndpoint.cs
-	File layout: AppHost/, GatewayHost/Modules/{Bff,Api,Features}, yarp/ (Aspire YARP config), frontend/, db/ (DBGate scripts).
+  Tech stack: .NET 10+ (Aspire AppHost 13+), EF Core + PostgreSQL, DBGate, YARP reverse-proxy, React frontend (Vite), Minimal API endpoints.
+  Minimum versions: .NET 10+, Aspire 13+.
+  Package policy: Always prefer the latest stable NuGet package versions at scaffold/implementation time; document exact package versions used in the generated `global.json` and `Directory.Packages.props`.
+  Orchestration: Aspire AppHost manages containers and services (Keycloak, Postgres/DBGate, standalone YARP container, GatewayHost, frontend).
+  Authentication: Keycloak realm with Google OIDC configured; BFF handles token exchange and cookie-based sessions.
+  Reverse proxy: YARP runs as a standalone container managed by the Aspire YARP integration and uses Aspire service-discovery for routes.
+  API conventions: Use Minimal API endpoint classes (one endpoint class per file) organized by feature:
+    Features/<FeatureName>/<Action>/<FeatureAction>Endpoint.cs
+    See examples: https://github.com/JobHunter07/api.jobhunter07.com/blob/master/JobHunter07.API/Features/BookFeature/CreateBook/CreateBookEndpoint.cs
+  File layout: AppHost/, GatewayHost/Modules/{Bff,Api,Features}, yarp/ (Aspire YARP config), frontend/, db/ (DBGate scripts).
 
 # Per-artifact rules: guidance enforced when creating artifacts
 rules:
-	proposal:
-		- Keep proposals concise (<= 800 words).
-		- Include Goals, Non-Goals, High-Level Deliverables, and Acceptance Criteria.
-		- Reference Aspire YARP integration when routing or gateway behavior is discussed.
-		- State the Minimal API per-endpoint requirement and provide example links.
-	design:
-		- Describe component responsibilities (AppHost, GatewayHost, YARP, Keycloak, DBGate, frontend).
-		- Document service-discovery usage for YARP and how services register routes.
-		- Include example feature folder layout and show a sample Minimal API endpoint path.
-		- Specify local dev flow: single `AppHost` command starts Keycloak, Postgres/DBGate, GatewayHost, and standalone YARP.
-	tasks:
-		- Break work into small, verifiable steps (prefer tasks that take <= 2 hours each).
-		- Include tasks to scaffold `AppHost`, `GatewayHost`, `yarp` config, `frontend`, DBGate provisioning, and sample Minimal API endpoints.
-		- Add verification steps for YARP service-discovery and Keycloak auth flow.
-	specs:
-		- Ensure API endpoint specs list route, HTTP method, request/response schema, auth requirements, and the expected minimal API endpoint class file path.
-		- Require spec examples for at least one sample feature implemented as a per-file Minimal API endpoint.
+  proposal:
+    - Keep proposals concise (<= 800 words).
+    - Include Goals, Non-Goals, High-Level Deliverables, and Acceptance Criteria.
+    - Reference Aspire YARP integration when routing or gateway behavior is discussed.
+    - State the Minimal API per-endpoint requirement and provide example links.
+  design:
+    - Describe component responsibilities (AppHost, GatewayHost, YARP, Keycloak, DBGate, frontend).
+    - Document service-discovery usage for YARP and how services register routes.
+    - Include example feature folder layout and show a sample Minimal API endpoint path.
+    - Specify local dev flow: single `AppHost` command starts Keycloak, Postgres/DBGate, GatewayHost, and standalone YARP.
+  tasks:
+    - Break work into small, verifiable steps (prefer tasks that take <= 2 hours each).
+    - Include tasks to scaffold `AppHost`, `GatewayHost`, `yarp` config, `frontend`, DBGate provisioning, and sample Minimal API endpoints.
+    - Add verification steps for YARP service-discovery and Keycloak auth flow.
+  specs:
+    - Ensure API endpoint specs list route, HTTP method, request/response schema, auth requirements, and the expected minimal API endpoint class file path.
+    - Require spec examples for at least one sample feature implemented as a per-file Minimal API endpoint.
 
 # Project-specific conventions
 conventions:
-	- Minimal API endpoints: one endpoint class per file; no large controller classes with many endpoints.
-	- Services must register with Aspire service-discovery if they should be routed by YARP.
-	- Secrets should default to safe local dev values and be overridable via environment variables.
-	- Keep domain logic out of template; include only minimal demo endpoints and a sample feature implemented with the per-file Minimal API pattern.
+  - Minimal API endpoints: one endpoint class per file; no large controller classes with many endpoints.
+  - Services must register with Aspire service-discovery if they should be routed by YARP.
+  - Secrets should default to safe local dev values and be overridable via environment variables.
+  - Keep domain logic out of template; include only minimal demo endpoints and a sample feature implemented with the per-file Minimal API pattern.
+
+# Post-change verification: automatically run a local pre-pr-check after changes
+postChange:
+  autoRun: false
+  disabledPath: disabled/pre-pr-check.ps1
+  note: The `pre-pr-check` script has been moved to `disabled/pre-pr-check.ps1` and auto-run is disabled. To re-enable, move or restore the script and set `autoRun: true`.

@@ -22,5 +22,32 @@
       },
       "problemMatcher": []
     }
+    ,
+    {
+      "label": "Run Aspire",
+      "type": "shell",
+      "command": "aspire run",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Run Aspire (PowerShell)",
+      "type": "shell",
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"aspire run\"",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
   ]
 }

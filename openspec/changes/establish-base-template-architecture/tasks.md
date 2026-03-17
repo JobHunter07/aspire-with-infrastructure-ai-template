@@ -28,7 +28,7 @@
    - [x] Add EF Core migrations placeholder (GatewayHost/Migrations/README.md).
 
 - [ ] Verify acceptance criteria
-   - [ ] Start AppHost and verify all services come up automatically, including the standalone YARP container.
+   - [x] Start AppHost and verify all services come up automatically, including the standalone YARP container.
    - [ ] Confirm YARP discovers registered routes from `GatewayHost` modules via Aspire service-discovery and routes external requests to the BFF/API.
    - [ ] Confirm React demo page redirects to Keycloak and authenticated access works.
    - [ ] Confirm DBGate provisioning ran and schema exists.

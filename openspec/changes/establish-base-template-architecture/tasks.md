@@ -16,11 +16,11 @@
 
  - [x] Implement initial template scaffold (implementation phase)
    - [x] Create `AppHost` project and `GatewayHost` project skeletons (scaffolded folders and READMEs).
-   - [ ] Add minimal `Keycloak` container configuration and local realm setup.
+   - [x] Add minimal `Keycloak` container configuration and local realm setup.
    - [x] Add `PostgreSQL` + DBGate provisioning scripts (added sample `db/provision.sql`).
    - [x] Add minimal React app placeholder (frontend README created).
    - [x] Create a standalone YARP reverse-proxy container config placeholder using the Aspire YARP extension (yarp/README.md).
-   - [ ] Wire Aspire orchestration to start components, including the YARP container, Keycloak, Postgres (DBGate), and GatewayHost.
+   - [x] Wire Aspire orchestration to start components, including the YARP container, Keycloak, Postgres (DBGate), and GatewayHost.
    - [ ] Add EF Core migrations and DB provisioning integration.
    - [x] Implement sample API endpoints using Minimal API per-endpoint classes (one class/file per endpoint). Created sample:
       - `GatewayHost/Modules/Api/Features/BookFeature/CreateBook/CreateBookEndpoint.cs` (sample minimal endpoint added)

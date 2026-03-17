@@ -21,12 +21,24 @@ var server = builder.AddProject<Projects.GatewayHost>("gatewayhost")
     .WaitFor(keycloak)
     .WithHttpHealthCheck("/health")
     .WithExternalHttpEndpoints()
-    .WithOtlpExporter();
+    .WithOtlpExporter(); 
 
 var webfrontend = builder.AddViteApp("webfrontend", "../frontend")
     .WithReference(server)
     .WaitFor(server);
 
 server.PublishWithContainerFiles(webfrontend, "wwwroot");
+
+
+var gateway = builder.AddYarp("gateway")
+                     .WithConfiguration(yarp =>
+                     {
+                         // Add catch-all route for frontend service
+                         yarp.AddRoute(server);
+
+                         // Service discovery automatically resolves server endpoints
+                         // yarp.AddRoute("/api/{**catch-all}", server);
+                     });
+
 
 builder.Build().Run();

@@ -1,4 +1,6 @@
 using GatewayHost.Modules.Api.Features.BookFeature.CreateBook;
+using Scalar.AspNetCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ builder.Services.AddProblemDetails();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+//builder.Services.RegisterApiEndpointsFromAssembly(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 
@@ -49,6 +53,18 @@ app.MapDefaultEndpoints();
 app.MapCreateBookEndpoint();
 
 app.UseFileServer();
+
+app.MapScalarApiReference(options =>
+{
+    options.WithTheme(ScalarTheme.DeepSpace);
+
+    // ?? THIS enables Developer Tools (request + client code panel)
+    options.WithDefaultHttpClient(
+        ScalarTarget.CSharp,
+        ScalarClient.HttpClient);
+
+});
+
 
 app.Run();
 

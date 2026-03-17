@@ -10,6 +10,7 @@ interface WeatherForecast {
 }
 
 function App() {
+  
   const [weatherData, setWeatherData] = useState<WeatherForecast[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -20,7 +21,7 @@ function App() {
     setError(null)
     
     try {
-      const response = await fetch('/api/weatherforecast')
+        const response = await fetch('/api/weatherforecast')
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

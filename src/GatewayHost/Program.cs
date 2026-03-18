@@ -1,14 +1,14 @@
 using GatewayHost.Modules.Api.Features.BookFeature;
 using GatewayHost.Modules.Bff;
 using Scalar.AspNetCore;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
-builder.AddRedisClientBuilder("cache")
-    .WithOutputCache();
+
+builder.AddRedisClientBuilder("cache").WithOutputCache();
+builder.AddRedisDistributedCache(connectionName: "cache");
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
@@ -52,6 +52,7 @@ app.MapDefaultEndpoints();
 
 // Map sample Minimal API endpoint(s)
 app.MapCreateBookEndpoint();
+
 // Map BFF endpoints (user/session login flow)
 app.MapBffEndpoints();
 

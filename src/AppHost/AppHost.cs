@@ -21,11 +21,15 @@ var server = builder.AddProject<Projects.GatewayHost>("gatewayhost")
     .WaitFor(keycloak)
     .WithHttpHealthCheck("/health")
     .WithExternalHttpEndpoints()
-    .WithOtlpExporter(); 
+    .WithOtlpExporter();
 
+#pragma warning disable ASPIRECERTIFICATES001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 var webfrontend = builder.AddViteApp("webfrontend", "../frontend")
     .WithReference(server)
-    .WaitFor(server);
+    .WaitFor(server)
+    .WithHttpsEndpoint(env: "PORT", port: 54955)
+    .WithHttpsDeveloperCertificate();
+#pragma warning restore ASPIRECERTIFICATES001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 server.PublishWithContainerFiles(webfrontend, "wwwroot");
 

@@ -1,8 +1,18 @@
 using GatewayHost.Modules.Api.Features.BookFeature;
 using GatewayHost.Modules.Bff;
 using Scalar.AspNetCore;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load developer user-secrets (if present) so sensitive Keycloak client settings
+// like ClientId/ClientSecret can be provided via `dotnet user-secrets` during local dev.
+if (builder.Environment.IsDevelopment())
+{
+    // optional: true so app still runs when no user-secrets are configured
+    builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true);
+}
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();

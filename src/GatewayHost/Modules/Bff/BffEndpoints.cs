@@ -1,16 +1,11 @@
-using System;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols;
-using Microsoft.IdentityModel.Tokens;
 
 namespace GatewayHost.Modules.Bff;
 
@@ -68,7 +63,7 @@ public static class BffEndpoints
             var qs = req.Query;
             var returnUrl = qs.TryGetValue("returnUrl", out var rv) ? rv.ToString() : "/";
 
-            var realmBase = cfg[ConfigKey_KeycloakRealm];
+            var realmBase = $"{cfg["KEYCLOAK_HTTPS"]}/{cfg[ConfigKey_KeycloakRealm]}";
             var clientId = cfg[ConfigKey_ClientId];
             if (string.IsNullOrEmpty(realmBase) || string.IsNullOrEmpty(clientId))
             {
@@ -81,7 +76,16 @@ public static class BffEndpoints
 
             var state = Guid.NewGuid().ToString("N");
             var nonce = Guid.NewGuid().ToString("N");
-            var stateObj = new StateData { Nonce = nonce, ReturnUrl = returnUrl };
+
+            // PKCE: generate code_verifier and code_challenge so Keycloak clients that require PKCE work.
+            var codeVerifierBytes = RandomNumberGenerator.GetBytes(32);
+            string Base64UrlEncode(byte[] input) => Convert.ToBase64String(input).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+            var codeVerifier = Base64UrlEncode(codeVerifierBytes);
+            using var sha = SHA256.Create();
+            var challengeBytes = sha.ComputeHash(Encoding.ASCII.GetBytes(codeVerifier));
+            var codeChallenge = Base64UrlEncode(challengeBytes);
+
+            var stateObj = new StateData { Nonce = nonce, ReturnUrl = returnUrl, CodeVerifier = codeVerifier };
             var stateCacheKey = StateCachePrefix + state;
             var stateJson = JsonSerializer.Serialize(stateObj);
             await cache.SetStringAsync(stateCacheKey, stateJson, new DistributedCacheEntryOptions
@@ -98,7 +102,9 @@ public static class BffEndpoints
                    .Append("&redirect_uri=").Append(Uri.EscapeDataString(callbackUrl))
                    .Append("&kc_idp_hint=google")
                    .Append("&state=").Append(Uri.EscapeDataString(state))
-                   .Append("&nonce=").Append(Uri.EscapeDataString(nonce));
+                   .Append("&nonce=").Append(Uri.EscapeDataString(nonce))
+                   .Append("&code_challenge=").Append(Uri.EscapeDataString(codeChallenge))
+                   .Append("&code_challenge_method=S256");
 
             return Results.Redirect(authUrl.ToString());
         })
@@ -146,14 +152,26 @@ public static class BffEndpoints
 
             var tokenEndpoint = realmBase.TrimEnd('/') + "/protocol/openid-connect/token";
             var httpClient = clientFactory.CreateClient();
-            var tokenRequest = new FormUrlEncodedContent(new[]
+            var tokenRequestPairs = new List<KeyValuePair<string,string>>
             {
                 new KeyValuePair<string,string>("grant_type","authorization_code"),
                 new KeyValuePair<string,string>("code", code),
                 new KeyValuePair<string,string>("redirect_uri", $"{req.Scheme}://{req.Host}/bff/callback"),
                 new KeyValuePair<string,string>("client_id", clientId),
-                new KeyValuePair<string,string>("client_secret", clientSecret ?? string.Empty)
-            });
+            };
+
+            // Include client_secret when configured (confidential clients). Include PKCE code_verifier when present.
+            if (!string.IsNullOrEmpty(clientSecret))
+            {
+                tokenRequestPairs.Add(new KeyValuePair<string,string>("client_secret", clientSecret));
+            }
+
+            if (!string.IsNullOrEmpty(stateObj.CodeVerifier))
+            {
+                tokenRequestPairs.Add(new KeyValuePair<string,string>("code_verifier", stateObj.CodeVerifier));
+            }
+
+            var tokenRequest = new FormUrlEncodedContent(tokenRequestPairs);
 
             var tokenResp = await httpClient.PostAsync(tokenEndpoint, tokenRequest);
             if (!tokenResp.IsSuccessStatusCode)
@@ -284,6 +302,7 @@ public static class BffEndpoints
     {
         public string? Nonce { get; init; }
         public string? ReturnUrl { get; init; }
+        public string? CodeVerifier { get; init; }
     }
 
     private record SessionData

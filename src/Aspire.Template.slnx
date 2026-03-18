@@ -1,7 +1,10 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="AppHost/AppHost.csproj" />
   <Project Path="GatewayHost/GatewayHost.csproj" />
-  <Project Path="FrontEnd/frontend.esproj" DisplayName="FrontEnd">
+  <Project Path="FrontEnd/frontend.esproj">
     <Build />
     <Deploy />
   </Project>

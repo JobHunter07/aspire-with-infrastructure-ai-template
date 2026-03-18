@@ -1,4 +1,5 @@
-using GatewayHost.Modules.Api.Features.BookFeature.CreateBook;
+using GatewayHost.Modules.Api.Features.BookFeature;
+using GatewayHost.Modules.Bff;
 using Scalar.AspNetCore;
 using System.Reflection;
 
@@ -51,6 +52,8 @@ app.MapDefaultEndpoints();
 
 // Map sample Minimal API endpoint(s)
 app.MapCreateBookEndpoint();
+// Map BFF endpoints (user/session login flow)
+app.MapBffEndpoints();
 
 app.UseFileServer();
 

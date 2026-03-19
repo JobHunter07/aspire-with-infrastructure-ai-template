@@ -3,7 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Aspire.Custom.Hosting;
+namespace Aspire.Ats;
 
 /// <summary>
 /// Marks a method, type, or assembly-level type as an ATS (Aspire Type System) export.

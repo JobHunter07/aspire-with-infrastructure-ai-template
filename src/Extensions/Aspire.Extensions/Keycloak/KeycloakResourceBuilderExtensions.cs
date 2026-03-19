@@ -7,8 +7,9 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using Aspire.Ats;
+using Aspire.Custom.ApplicationModel;
 using Aspire.Hosting;
-using Aspire.Custom.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Keycloak;
 
@@ -58,7 +59,7 @@ public static class KeycloakResourceBuilderExtensions
     [AspireExport("addKeycloak", Description = "Adds a Keycloak container resource")]
 #pragma warning restore ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 #pragma warning disable CS0436 // Type conflicts with imported type
-    public static IResourceBuilder<KeycloakResource> AddKeycloak(
+    public static IResourceBuilder<Custom.ApplicationModel.KeycloakResource> AddKeycloak(
 #pragma warning restore CS0436 // Type conflicts with imported type
         this IDistributedApplicationBuilder builder,
         string name,
@@ -71,7 +72,7 @@ public static class KeycloakResourceBuilderExtensions
 
         var passwordParameter = adminPassword?.Resource ?? ParameterResourceBuilderExtensions.CreateDefaultPasswordParameter(builder, $"{name}-password");
 
-        var resource = new KeycloakResource(name, adminUsername?.Resource, passwordParameter);
+        var resource = new Custom.ApplicationModel.KeycloakResource(name, adminUsername?.Resource, passwordParameter);
 
         var keycloak = builder
             .AddResource(resource)
@@ -156,8 +157,10 @@ public static class KeycloakResourceBuilderExtensions
     /// </code>
     /// </example>
     /// </remarks>
+#pragma warning disable ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     [AspireExport("withDataVolume", Description = "Adds a data volume for Keycloak")]
-    public static IResourceBuilder<KeycloakResource> WithDataVolume(this IResourceBuilder<KeycloakResource> builder, string? name = null)
+#pragma warning restore ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    public static IResourceBuilder<Custom.ApplicationModel.KeycloakResource> WithDataVolume(this IResourceBuilder<Custom.ApplicationModel.KeycloakResource> builder, string? name = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
 

@@ -3,9 +3,10 @@
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="AppHost/AppHost.csproj" />
-  <Project Path="GatewayHost/GatewayHost.csproj" />
+  <Project Path="Extensions/Aspire.Extensions/Aspire.Extensions.csproj" Id="dc4c5709-d4f0-4c31-b973-9df2b6d3a4a1" />
   <Project Path="FrontEnd/frontend.esproj">
     <Build />
     <Deploy />
   </Project>
+  <Project Path="GatewayHost/GatewayHost.csproj" />
 </Solution>

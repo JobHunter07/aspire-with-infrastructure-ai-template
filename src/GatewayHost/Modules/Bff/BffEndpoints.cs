@@ -142,7 +142,7 @@ public static class BffEndpoints
                 return Results.BadRequest("Invalid state payload.");
             }
 
-            var realmBase = cfg[ConfigKey_KeycloakRealm];
+            var realmBase = $"{cfg["KEYCLOAK_HTTPS"]}/{cfg[ConfigKey_KeycloakRealm]}";
             var clientId = cfg[ConfigKey_ClientId];
             var clientSecret = cfg[ConfigKey_ClientSecret];
             if (string.IsNullOrEmpty(realmBase) || string.IsNullOrEmpty(clientId))

@@ -80,7 +80,6 @@ namespace Aspire.Ats;
     AttributeTargets.Method | AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Assembly | AttributeTargets.Property,
     Inherited = false,
     AllowMultiple = true)]
-[Experimental("ASPIREATS001")]
 public sealed class AspireExportAttribute : Attribute
 {
     /// <summary>

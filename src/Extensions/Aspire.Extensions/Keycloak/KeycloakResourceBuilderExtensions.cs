@@ -117,13 +117,10 @@ public static class KeycloakResourceBuilderExtensions
 
         if (builder.ExecutionContext.IsRunMode)
         {
-            keycloak.SubscribeHttpsEndpointsUpdate(ctx =>
+            builder.Eventing.Subscribe<BeforeStartEvent>((_, _) =>
             {
-                // If a TLS certificate is configured, ensure the keycloak resource has an HTTPS endpoint and
-                // configure the environment variables to use it.
-                keycloak
-                    .WithHttpsEndpoint(targetPort: DefaultHttpsPort, env: "KC_HTTPS_PORT")
-                    .WithEndpoint(ManagementEndpointName, ep => ep.UriScheme = "https");
+                keycloak.WithEndpoint("https", ep => ep.Port = 9999);
+                return Task.CompletedTask;
             });
         }
 
@@ -183,8 +180,10 @@ public static class KeycloakResourceBuilderExtensions
     /// </code>
     /// </example>
     /// </remarks>
+#pragma warning disable ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
     [AspireExport("withDataBindMount", Description = "Adds a data bind mount for Keycloak")]
-    public static IResourceBuilder<KeycloakResource> WithDataBindMount(this IResourceBuilder<KeycloakResource> builder, string source)
+#pragma warning restore ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    public static IResourceBuilder<Custom.ApplicationModel.KeycloakResource> WithDataBindMount(this IResourceBuilder<Custom.ApplicationModel.KeycloakResource> builder, string source)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrEmpty(source);
@@ -210,8 +209,8 @@ public static class KeycloakResourceBuilderExtensions
     /// </example>
     /// </remarks>
     [Obsolete("Use WithRealmImport(string import) instead.")]
-    public static IResourceBuilder<KeycloakResource> WithRealmImport(
-        this IResourceBuilder<KeycloakResource> builder,
+    public static IResourceBuilder<Custom.ApplicationModel.KeycloakResource> WithRealmImport(
+        this IResourceBuilder<Custom.ApplicationModel.KeycloakResource> builder,
         string import,
         bool isReadOnly)
     {
@@ -239,21 +238,21 @@ public static class KeycloakResourceBuilderExtensions
     /// </code>
     /// </example>
     /// </remarks>
-    [AspireExportIgnore(Reason = "Parameter name 'import' is a reserved keyword in TypeScript. Use the internal ATS-compatible overload instead.")]
-    public static IResourceBuilder<KeycloakResource> WithRealmImport(
-        this IResourceBuilder<KeycloakResource> builder,
-        string import)
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrEmpty(import);
+    //[AspireExportIgnore(Reason = "Parameter name 'import' is a reserved keyword in TypeScript. Use the internal ATS-compatible overload instead.")]
+    //public static IResourceBuilder<KeycloakResource> WithRealmImport(
+    //    this IResourceBuilder<KeycloakResource> builder,
+    //    string import)
+    //{
+    //    ArgumentNullException.ThrowIfNull(builder);
+    //    ArgumentException.ThrowIfNullOrEmpty(import);
 
-        var importFullPath = Path.GetFullPath(import, builder.ApplicationBuilder.AppHostDirectory);
+    //    var importFullPath = Path.GetFullPath(import, builder.ApplicationBuilder.AppHostDirectory);
 
-        return builder.WithContainerFiles(
-            KeycloakImportDirectory,
-            importFullPath,
-            defaultOwner: KeycloakContainerImageTags.ContainerUser);
-    }
+    //    return builder.WithContainerFiles(
+    //        KeycloakImportDirectory,
+    //        importFullPath,
+    //        defaultOwner: KeycloakContainerImageTags.ContainerUser);
+    //}
 
     /// <summary>
     /// Additional feature names to enable for the keycloak resource
@@ -261,20 +260,20 @@ public static class KeycloakResourceBuilderExtensions
     /// <param name="builder">The resource builder.</param>
     /// <param name="features">Names of features to enable for the keycloak resource</param>
     /// <returns>The <see cref="IResourceBuilder{T}"/>.</returns>
-    [AspireExport("withEnabledFeatures", Description = "Enables Keycloak features")]
-    public static IResourceBuilder<KeycloakResource> WithEnabledFeatures(
-        this IResourceBuilder<KeycloakResource> builder,
-        params string[] features)
-    {
-        foreach (var feature in features)
-        {
-            // Add the feature to the enabled features set (and ensure it isn't in the disabled features set)
-            builder.Resource.EnabledFeatures.Add(feature);
-            builder.Resource.DisabledFeatures.Remove(feature);
-        }
+    //[AspireExport("withEnabledFeatures", Description = "Enables Keycloak features")]
+    //public static IResourceBuilder<KeycloakResource> WithEnabledFeatures(
+    //    this IResourceBuilder<KeycloakResource> builder,
+    //    params string[] features)
+    //{
+    //    foreach (var feature in features)
+    //    {
+    //        // Add the feature to the enabled features set (and ensure it isn't in the disabled features set)
+    //        builder.Resource.EnabledFeatures.Add(feature);
+    //        builder.Resource.DisabledFeatures.Remove(feature);
+    //    }
 
-        return builder;
-    }
+    //    return builder;
+    //}
 
     /// <summary>
     /// Additional feature names to disable for the keycloak resource
@@ -282,20 +281,20 @@ public static class KeycloakResourceBuilderExtensions
     /// <param name="builder">The resource builder.</param>
     /// <param name="features">Names of features to disable for the keycloak resource</param>
     /// <returns>The <see cref="IResourceBuilder{T}"/>.</returns>
-    [AspireExport("withDisabledFeatures", Description = "Disables Keycloak features")]
-    public static IResourceBuilder<KeycloakResource> WithDisabledFeatures(
-        this IResourceBuilder<KeycloakResource> builder,
-        params string[] features)
-    {
-        foreach (var feature in features)
-        {
-            // Add the feature to the disabled features set (and ensure it isn't in the enabled features set)
-            builder.Resource.DisabledFeatures.Add(feature);
-            builder.Resource.EnabledFeatures.Remove(feature);
-        }
+    //[AspireExport("withDisabledFeatures", Description = "Disables Keycloak features")]
+    //public static IResourceBuilder<KeycloakResource> WithDisabledFeatures(
+    //    this IResourceBuilder<KeycloakResource> builder,
+    //    params string[] features)
+    //{
+    //    foreach (var feature in features)
+    //    {
+    //        // Add the feature to the disabled features set (and ensure it isn't in the enabled features set)
+    //        builder.Resource.DisabledFeatures.Add(feature);
+    //        builder.Resource.EnabledFeatures.Remove(feature);
+    //    }
 
-        return builder;
-    }
+    //    return builder;
+    //}
 
     /// <summary>
     /// Injects the appropriate environment variables to allow the resource to enable sending telemetry to the dashboard.
@@ -308,17 +307,19 @@ public static class KeycloakResourceBuilderExtensions
     /// </summary>
     /// <param name="builder">The keycloak resource builder.</param>
     /// <returns>The <see cref="IResourceBuilder{KeycloakResource}"/>.</returns>
-    [AspireExport("withOtlpExporter", Description = "Configures the OTLP exporter for Keycloak")]
-    public static IResourceBuilder<KeycloakResource> WithOtlpExporter(this IResourceBuilder<KeycloakResource> builder)
-    {
-        ArgumentNullException.ThrowIfNull(builder);
+#pragma warning disable ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+//    [AspireExport("withOtlpExporter", Description = "Configures the OTLP exporter for Keycloak")]
+//#pragma warning restore ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+//    public static IResourceBuilder<Custom.ApplicationModel.KeycloakResource> WithOtlpExporter(this IResourceBuilder<Custom.ApplicationModel.KeycloakResource> builder)
+//    {
+//        ArgumentNullException.ThrowIfNull(builder);
 
-        // Opentelemetry support requires the opentelemetry feature to be enabled.
-        builder.WithEnabledFeatures("opentelemetry");
-        OtlpConfigurationExtensions.WithOtlpExporter(builder);
+//        // Opentelemetry support requires the opentelemetry feature to be enabled.
+//        builder.WithEnabledFeatures("opentelemetry");
+//        OtlpConfigurationExtensions.WithOtlpExporter(builder);
 
-        return builder;
-    }
+//        return builder;
+//    }
 
     /// <summary>
     /// Injects the appropriate environment variables to allow the resource to enable sending telemetry to the dashboard.
@@ -332,27 +333,29 @@ public static class KeycloakResourceBuilderExtensions
     /// <param name="builder">The keycloak resource builder.</param>
     /// <param name="protocol">The protocol to use for the OTLP exporter. If not set, it will try gRPC then Http.</param>
     /// <returns>The <see cref="IResourceBuilder{KeycloakResource}"/>.</returns>
-    [AspireExport("withOtlpExporterWithProtocol", Description = "Configures the OTLP exporter for Keycloak with a specific protocol")]
-    public static IResourceBuilder<KeycloakResource> WithOtlpExporter(this IResourceBuilder<KeycloakResource> builder, OtlpProtocol protocol)
-    {
-        ArgumentNullException.ThrowIfNull(builder);
+#pragma warning disable ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+//    [AspireExport("withOtlpExporterWithProtocol", Description = "Configures the OTLP exporter for Keycloak with a specific protocol")]
+//#pragma warning restore ASPIREATS001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+//    public static IResourceBuilder<Custom.ApplicationModel.KeycloakResource> WithOtlpExporter(this IResourceBuilder<Custom.ApplicationModel.KeycloakResource> builder, OtlpProtocol protocol)
+//    {
+//        ArgumentNullException.ThrowIfNull(builder);
 
-        // Opentelemetry support requires the opentelemetry feature to be enabled.
-        builder.WithEnabledFeatures("opentelemetry");
-        OtlpConfigurationExtensions.WithOtlpExporter(builder, protocol);
+//        // Opentelemetry support requires the opentelemetry feature to be enabled.
+//        builder.WithEnabledFeatures("opentelemetry");
+//        OtlpConfigurationExtensions.WithOtlpExporter(builder, protocol);
 
-        return builder;
-    }
+//        return builder;
+//    }
 
     /// <summary>
     /// Adds a realm import to a Keycloak container resource.
     /// </summary>
-    [AspireExport("withRealmImport", Description = "Imports a Keycloak realm configuration")]
-    internal static IResourceBuilder<KeycloakResource> WithRealmImportInternal(
-        this IResourceBuilder<KeycloakResource> builder,
-        string importPath)
-    {
-        return builder.WithRealmImport(importPath);
-    }
+    //[AspireExport("withRealmImport", Description = "Imports a Keycloak realm configuration")]
+    //internal static IResourceBuilder<Custom.ApplicationModel.KeycloakResource> WithRealmImportInternal(
+    //    this IResourceBuilder<Custom.ApplicationModel.KeycloakResource> builder,
+    //    string importPath)
+    //{
+    //    return builder.WithRealmImport(importPath);
+    //}
 }
 

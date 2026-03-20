@@ -60,6 +60,9 @@ server.PublishWithContainerFiles(webfrontend, "wwwroot");
 var gateway = builder.AddYarp("gateway")
                      .WithConfiguration(yarp =>
                      {
+                         // Route root "/" to WebUI
+                         yarp.AddRoute("/", webfrontend);
+
                          // Add catch-all route for frontend service
                          yarp.AddRoute(server);
 

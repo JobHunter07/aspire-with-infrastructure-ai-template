@@ -254,7 +254,7 @@ public static class BffEndpoints
 
                 await cache.RemoveAsync(stateCacheKey);
 
-                return Results.Redirect(stateObj.ReturnUrl ?? "/");
+                return Results.Redirect(stateObj.ReturnUrl ?? "https://localhost:54955");
             }
             catch (SecurityTokenValidationException ex)
             {

@@ -1,8 +1,8 @@
+using GatewayHost.Extensions;
 using GatewayHost.Modules.Api.Features.BookFeature;
+using GatewayHost.Modules.Api.Features.Weather;
 using GatewayHost.Modules.Bff;
-using Scalar.AspNetCore;
 using System.Reflection;
-using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +26,8 @@ builder.Services.AddProblemDetails();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-//builder.Services.RegisterApiEndpointsFromAssembly(Assembly.GetExecutingAssembly());
+builder.Services.AddGatewayAuthentication(builder.Configuration);
+builder.Services.AddGatewayYarp();
 
 var app = builder.Build();
 
@@ -40,49 +41,15 @@ if (app.Environment.IsDevelopment())
 
 app.UseOutputCache();
 
-string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
-
-var api = app.MapGroup("/api");
-api.MapGet("weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.CacheOutput(p => p.Expire(TimeSpan.FromSeconds(5)))
-.WithName("GetWeatherForecast");
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapDefaultEndpoints();
-
-// Map sample Minimal API endpoint(s)
+app.MapWeatherEndpoint();
 app.MapCreateBookEndpoint();
-
-// Map BFF endpoints (user/session login flow)
 app.MapBffEndpoints();
-
-app.UseFileServer();
-
-app.MapScalarApiReference(options =>
-{
-    options.WithTheme(ScalarTheme.DeepSpace);
-
-    // ?? THIS enables Developer Tools (request + client code panel)
-    options.WithDefaultHttpClient(
-        ScalarTarget.CSharp,
-        ScalarClient.HttpClient);
-
-});
-
+app.MapGatewayAuthEndpoints();
+app.MapReverseProxy();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

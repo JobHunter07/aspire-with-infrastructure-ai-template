@@ -1,13 +1,11 @@
-using System.Net.Sockets;
-
 var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache");
 
 var postgres = builder.AddPostgres("postgres")
                       .WithLifetime(ContainerLifetime.Persistent)
-                      .WithDataVolume()
-                      .WithDbGate();
+                      .WithDataVolume();
+                      //.WithDbGate();
 
 var database = postgres.AddDatabase("keycloak-db");
 
@@ -32,16 +30,15 @@ builder.Eventing.Subscribe<BeforeStartEvent>((_, _) =>
     return Task.CompletedTask;
 });
 
-
-var server = builder.AddProject<Projects.GatewayHost>("gatewayhost")
+// GatewayHost (BFF + YARP + OIDC)
+var server = builder.AddProject<Projects.GatewayHost>("gateway")
     .WithReference(postgres)
     .WaitFor(postgres)
     .WithReference(cache)
     .WaitFor(cache)
-    //.WithReference(keycloak)
-    // KEYCLOAK_HTTPS
-    .WithEnvironment("KEYCLOAK_HTTPS", "https://localhost:9999")
+    .WithReference(keycloak)
     .WaitFor(keycloak)
+    .WithEnvironment("KEYCLOAK_HTTPS", "https://localhost:9999")
     .WithHttpHealthCheck("/health")
     .WithExternalHttpEndpoints()
     .WithOtlpExporter();
@@ -55,20 +52,5 @@ var webfrontend = builder.AddViteApp("webfrontend", "../frontend")
 #pragma warning restore ASPIRECERTIFICATES001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 server.PublishWithContainerFiles(webfrontend, "wwwroot");
-
-
-var gateway = builder.AddYarp("gateway")
-                     .WithConfiguration(yarp =>
-                     {
-                         // Route root "/" to WebUI
-                         yarp.AddRoute("/", webfrontend);
-
-                         // Add catch-all route for frontend service
-                         yarp.AddRoute(server);
-
-                         // Service discovery automatically resolves server endpoints
-                         // yarp.AddRoute("/api/{**catch-all}", server);
-                     });
-
 
 builder.Build().Run();

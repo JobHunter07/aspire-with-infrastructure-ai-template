@@ -1,12 +1,9 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ServiceDiscovery;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Scalar.AspNetCore;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -122,6 +119,17 @@ public static class Extensions
                 Predicate = r => r.Tags.Contains("live")
             });
         }
+
+        app.MapScalarApiReference(options =>
+        {
+            options.WithTheme(ScalarTheme.DeepSpace);
+
+            // ?? THIS enables Developer Tools (request + client code panel)
+            options.WithDefaultHttpClient(
+                ScalarTarget.CSharp,
+                ScalarClient.HttpClient);
+
+        });
 
         return app;
     }

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Routing;
-
 namespace GatewayHost.Modules.Api.Features.BookFeature;
 
 public record CreateBookRequest(string Title, string Author);

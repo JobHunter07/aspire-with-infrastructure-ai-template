@@ -398,6 +398,30 @@
   animation: spin 1s linear infinite;
 }
 
+/* Auth bar in header */
+.auth-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-email {
+  font-size: 0.95rem;
+  color: var(--text-tertiary);
+  padding: 0.25rem 0.5rem;
+  background: rgba(255,255,255,0.02);
+  border-radius: 0.25rem;
+}
+
+/* Simple polished logout button matching material-style CTA */
+.auth-bar .refresh-button {
+  height: 2.5rem;
+  padding: 0 1rem;
+  min-width: 88px;
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+
 /* Error message */
 .error-message {
   display: flex;

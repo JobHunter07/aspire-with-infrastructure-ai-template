@@ -36,7 +36,7 @@
 
 ## Security & Auth Flow
 1. User visits React app and clicks “Demo” (protected).
-2. React requests `/bff/identity` (or `/bff/login`) — BFF redirects to Keycloak if no session.
+2. React requests `/bff/login`) — BFF redirects to Keycloak if no session.
 3. Keycloak handles Google social login and returns code to BFF client.
 4. BFF exchanges code for tokens, creates a secure HttpOnly cookie session, and redirects back to the React app.
 5. React calls BFF-proxied APIs; BFF attaches user context server-side.

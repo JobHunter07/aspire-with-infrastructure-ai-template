@@ -12,8 +12,18 @@ export default defineConfig({
             target:
                 process.env.GATEWAYHOST_HTTPS ??
                 process.env.GATEWAYHOST_HTTP ??
-                // fallback for local development
-                'http://localhost:5430',
+                // fallback for local development (backend in this template runs with HTTPS on 54955)
+                'https://localhost:54955',
+        changeOrigin: true,
+        secure: false
+      }
+      ,
+      // Proxy BFF endpoints (login/callback/user/logout) to the backend during dev
+      '/bff': {
+        target:
+            process.env.GATEWAYHOST_HTTPS ??
+            process.env.GATEWAYHOST_HTTP ??
+            'http://localhost:5430',
         changeOrigin: true,
         secure: false
       }

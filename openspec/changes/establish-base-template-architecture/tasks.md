@@ -30,7 +30,7 @@
 - [ ] Verify acceptance criteria
    - [x] Start AppHost and verify all services come up automatically, including the standalone YARP container.
    - [ ] Confirm YARP discovers registered routes from `GatewayHost` modules via Aspire service-discovery and routes external requests to the BFF/API.
-   - [ ] Confirm React demo page redirects to Keycloak and authenticated access works.
+   - [ ] Confirm React demo page calls BFF which redirects to Keycloak and authenticated access works.
    - [ ] Confirm DBGate provisioning ran and schema exists.
    - [ ] Confirm sample API endpoints are implemented as Minimal API classes, one per file, and registered with the service discovery system so YARP can route to them.
 

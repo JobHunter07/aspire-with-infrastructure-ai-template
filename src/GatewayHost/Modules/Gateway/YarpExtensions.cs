@@ -6,8 +6,8 @@ public static class YarpExtensions
 {
     public static IServiceCollection AddGatewayYarp(
         this IServiceCollection services,
-        string webUiAddress = "http://webui/",
-        string apiAddress = "http://api/")
+        string webUiAddress = "https://localhost:54955", //ToDo:kbdavis07: Get these values from Aspire Injection.
+        string apiAddress = "https://localhost:7415")
     {
         services.AddReverseProxy()
             .LoadFromMemory(

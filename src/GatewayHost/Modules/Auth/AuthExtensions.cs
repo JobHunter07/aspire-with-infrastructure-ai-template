@@ -7,7 +7,7 @@ public static class AuthExtensions
     public static IServiceCollection AddGatewayAuthentication(
         this IServiceCollection services,
         IConfiguration config,
-        string authority = "https://localhost:8443/realms/aspire-template-dev",
+        string authority = "https://localhost:9999/realms/aspire-template-dev", //ToDo:kbdavis07: Get this from Aspire Injection
         string clientId = "gatewayhost",
         string cookieName = "__Host-gateway")
     {
@@ -32,7 +32,7 @@ public static class AuthExtensions
         {
             options.Authority = authority;
             options.ClientId = clientId;
-            options.ClientSecret = config["Keycloak:ClientSecret"];
+            options.ClientSecret = config["Bff:Keycloak:ClientSecret"];
             options.ResponseType = "code";
             options.SaveTokens = true;
 

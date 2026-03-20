@@ -13,7 +13,7 @@ export default defineConfig({
                 process.env.GATEWAYHOST_HTTPS ??
                 process.env.GATEWAYHOST_HTTP ??
                 // fallback for local development (backend in this template runs with HTTPS on 54955)
-                'https://localhost:54955',
+                'https://localhost:7415',
         changeOrigin: true,
         secure: false
       }
@@ -23,7 +23,7 @@ export default defineConfig({
         target:
             process.env.GATEWAYHOST_HTTPS ??
             process.env.GATEWAYHOST_HTTP ??
-            'http://localhost:5430',
+            'http://localhost:7415',
         changeOrigin: true,
         secure: false
       }

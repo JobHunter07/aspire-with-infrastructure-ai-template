@@ -1,8 +1,8 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
-    <Project Path="Aspire.Template.AppHost/Aspire.Template.AppHost.csproj" Id="be1b2312-7c40-4236-9263-8a789dcd8a33" />
-    <Project Path="Aspire.Template.Server/Aspire.Template.Server.csproj" />
+    <Project Path="Aspire.Template.AppHost/AppHost.csproj" Id="be1b2312-7c40-4236-9263-8a789dcd8a33" />
+    <Project Path="Aspire.Template.Server/Gateway.csproj" />
     <Project Path="FrontEnd/frontend.esproj">
       <Build />
       <Deploy />

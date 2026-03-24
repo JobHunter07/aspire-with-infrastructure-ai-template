@@ -2,7 +2,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 var cache = builder.AddRedis("cache");
 
-var server = builder.AddProject<Projects.Aspire_Template_Server>("server")
+var server = builder.AddProject<Projects.Gateway>("Gateway")
     .WithReference(cache)
     .WaitFor(cache)
     .WithHttpHealthCheck("/health")

@@ -1,15 +1,28 @@
+using Gateway.API.Config;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
-builder.AddRedisClientBuilder("cache")
-       .WithOutputCache();
-
-// Add services to the container.
+builder.AddRedisClientBuilder("cache").WithOutputCache();
 builder.Services.AddProblemDetails();
 
+// https://medium.com/@ahmedmohamedelahmar/implement-api-gateway-with-token-handler-pattern-using-net-redis-and-keycloak-38250bfbd733
+// https://github.com/Redestros/ApiGateway
 
-// Add services to the container.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddReverseProxy(builder.Configuration);
+builder.Services.AddOAuthProxy();
+builder.Services.AddAuthorizationPolicies();
+
+const string corsPolicy = "defaultCorsPolicy";
+builder.Services.AddCors(options => options.AddPolicy(corsPolicy,
+    configurePolicy => configurePolicy
+        .WithOrigins("http://localhost:4200", "https://localhost:7285", "http://localhost:8080") //ToDo:kbdavis07: Use Aspire Discovery for this
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()));
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -23,34 +36,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseOutputCache();
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-var api = app.MapGroup("/api");
-
-api.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.CacheOutput(p => p.Expire(TimeSpan.FromSeconds(5)))
-.WithName("GetWeatherForecast");
-
 app.MapDefaultEndpoints();
-
+app.UseRouting();
+app.UseCors(corsPolicy);
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapReverseProxy();
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

@@ -19,6 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Realms\" />
+    <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

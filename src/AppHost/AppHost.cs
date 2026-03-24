@@ -29,23 +29,31 @@ builder.Eventing.Subscribe<BeforeStartEvent>((_, _) =>
     return Task.CompletedTask;
 });
 
+// Resource API: Weather
+var weather = builder.AddProject<Projects.Weather_API>("Weather")
+    .WithReference(cache)
+    .WaitFor(cache)
+    .WithHttpHealthCheck("/health");
+
 // API Gateway (BFF + YARP + OIDC)
-var gateway = builder.AddProject<Projects.Gateway>("Gateway")
+var gateway = builder.AddProject<Projects.Gateway_API>("Gateway")
     .WithReference(cache)
     .WaitFor(cache)
     .WithReference(keycloak)
     .WaitFor(keycloak)
+    .WithReference(weather)
+    .WaitFor(weather)
     .WithHttpHealthCheck("/health")
     .WithExternalHttpEndpoints();
 
 // Front End only Interacts with the API Gateway, and Resources are Proxied through the API Gateway with YARP
 #pragma warning disable ASPIRECERTIFICATES001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-var webfrontend = builder.AddViteApp("webfrontend", "../frontend")
+var webfrontend = builder.AddViteApp("WebFrontEnd", "../frontend")
     .WithReference(gateway)
     .WaitFor(gateway)
     .WithHttpsEndpoint(env: "PORT", port: 54955)
     .WithHttpsDeveloperCertificate();
-#pragma warning restore ASPIRECERTIFICATES001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+//#pragma warning restore ASPIRECERTIFICATES001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
 gateway.PublishWithContainerFiles(webfrontend, "wwwroot");
 

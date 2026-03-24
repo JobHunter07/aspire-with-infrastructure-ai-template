@@ -34,7 +34,7 @@ public static class OauthProxyExtension
                 //Use default signin scheme
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
-                options.Authority = proxyOptions.Authority;
+                options.Authority = proxyOptions.Authority; //ToDo:kbdavis07: Use Env Var for base URI: KEYCLOAK_HTTPS
                 options.RequireHttpsMetadata = false;
 
                 options.ClientId = proxyOptions.ClientId;

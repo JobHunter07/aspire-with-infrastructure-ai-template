@@ -9,15 +9,17 @@ public static class AccountEndPoints
 {
     public static WebApplication MapAccountEndpoints(this WebApplication app)
     {
+        var api = app.MapGroup("/api");
+
         // Public endpoint - cacheable for a short duration
-        app.MapGet("/account/public", () => Results.Ok("Welcome to API Gateway"))
+        api.MapGet("/account/public", () => Results.Ok("Welcome to API Gateway"))
             .Produces<string>(StatusCodes.Status200OK)
             .WithName("AccountPublic")
             .WithTags("Account")
             .WithMetadata(new ResponseCacheAttribute { Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false });
 
         // Login triggers the OIDC challenge flow. Allow anonymous access.
-        RouteHandlerBuilder loginEndpoint = (RouteHandlerBuilder)app.MapGet("/account/login", async (HttpContext http) =>
+        RouteHandlerBuilder loginEndpoint = (RouteHandlerBuilder)api.MapGet("/account/login", async (HttpContext http) =>
         {
             await http.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
             {
@@ -31,7 +33,7 @@ public static class AccountEndPoints
             .AllowAnonymous();
 
         // Info requires authentication and returns the user's claims
-        app.MapGet("/account/info", (HttpContext http) =>
+        api.MapGet("/account/info", (HttpContext http) =>
         {
             var claims = http.User?.Claims
                 .Select(c => (object)new { c.Type, c.Value })
@@ -45,7 +47,7 @@ public static class AccountEndPoints
         .RequireAuthorization();
 
         // Logout signs out from OIDC and cookie schemes and redirects to the public page
-        app.MapGet("/account/logout", async (HttpContext http) =>
+        api.MapGet("/account/logout", async (HttpContext http) =>
         {
             var prop = new AuthenticationProperties
             {

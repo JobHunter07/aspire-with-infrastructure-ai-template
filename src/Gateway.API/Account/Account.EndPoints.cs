@@ -7,8 +7,18 @@ namespace Gateway.API.Account;
 
 public static class AccountEndPoints
 {
+    private const string FrontendUrl = "https://localhost:54955";
+
     public static WebApplication MapAccountEndpoints(this WebApplication app)
     {
+        // Root entry point: requires authentication.
+        // Unauthenticated users are automatically challenged via OIDC; after login
+        // the OIDC handler returns them here and they are redirected to the frontend.
+        app.MapGet("/", () => Results.Redirect(FrontendUrl))
+            .WithName("FrontendRoot")
+            .WithTags("Account")
+            .RequireAuthorization();
+
         var api = app.MapGroup("/api");
 
         // Public endpoint - cacheable for a short duration

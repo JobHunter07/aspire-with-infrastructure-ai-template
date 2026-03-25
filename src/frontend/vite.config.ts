@@ -6,10 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Proxy API calls to the app service
+      // Proxy API calls to the API Gateway, which handles auth and routes upstream.
       '/api': {
-        target: process.env.SERVER_HTTPS || process.env.SERVER_HTTP,
-        changeOrigin: true
+            target: process.env.GATEWAY_HTTPS,
+        changeOrigin: true,
+        secure: false  // accept self-signed cert in development
       }
     }
   }

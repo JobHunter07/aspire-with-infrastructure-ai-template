@@ -20,7 +20,7 @@ builder.Services.AddAuthorizationPolicies();
 const string corsPolicy = "defaultCorsPolicy";
 builder.Services.AddCors(options => options.AddPolicy(corsPolicy,
     configurePolicy => configurePolicy                                                           
-        .WithOrigins("http://localhost:4200", "https://localhost:7285", "http://localhost:8080") //ToDo:kbdavis07: Use Env var's for this
+        .WithOrigins("http://localhost:4200", "https://localhost:7285", "http://localhost:8080", "https://localhost:54955") //ToDo:kbdavis07: Use Env var's for this
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()));

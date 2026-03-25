@@ -6,26 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Proxy API calls to the app service
+      // Proxy API calls to the API Gateway, which handles auth and routes upstream.
       '/api': {
-            // Prefer Aspire-injected env vars GATEWAYHOST_HTTPS / GATEWAYHOST_HTTP
-            target:
-                process.env.GATEWAYHOST_HTTPS ??
-                process.env.GATEWAYHOST_HTTP ??
-                // fallback for local development (backend in this template runs with HTTPS on 54955)
-                'https://localhost:7415',
+            target: process.env.GATEWAY_HTTPS,
         changeOrigin: true,
-        secure: false
-      }
-      ,
-      // Proxy BFF endpoints (login/callback/user/logout) to the backend during dev
-      '/bff': {
-        target:
-            process.env.GATEWAYHOST_HTTPS ??
-            process.env.GATEWAYHOST_HTTP ??
-            'http://localhost:7415',
-        changeOrigin: true,
-        secure: false
+        secure: false  // accept self-signed cert in development
       }
     }
   }

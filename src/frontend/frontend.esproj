@@ -3,7 +3,4 @@
     <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
     <ShouldRunBuildScript>false</ShouldRunBuildScript>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="scripts\" />
-  </ItemGroup>
 </Project>

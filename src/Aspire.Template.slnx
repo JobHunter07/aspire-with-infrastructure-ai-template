@@ -1,11 +1,13 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <Project Path="AppHost/AppHost.csproj" Id="be1b2312-7c40-4236-9263-8a789dcd8a33" />
+	<Project Path="Weather.API/Weather.API.csproj" />
+    <Project Path="Gateway.API/Gateway.API.csproj" Id="80b324f6-1458-4e0d-a27f-aee4bf2cb108" />
+	<Project Path="ServiceDefaults/ServiceDefaults.csproj" Id="14250820-8ffc-4306-8fa3-aab4c518bdb1" />
+    <Project Path="FrontEnd/frontend.esproj">
+      <Build />
+      <Deploy />
+    </Project>
   </Folder>
-  <Project Path="AppHost/AppHost.csproj" />
-  <Project Path="GatewayHost/GatewayHost.csproj" />
-  <Project Path="FrontEnd/frontend.esproj">
-    <Build />
-    <Deploy />
-  </Project>
 </Solution>

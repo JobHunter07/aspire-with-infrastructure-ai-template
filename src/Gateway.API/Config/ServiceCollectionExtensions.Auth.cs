@@ -11,6 +11,7 @@ public static class OauthProxyExtension
     public static void AddOAuthProxy(this IServiceCollection services)
     {
         services.AddSingleton<CookieOidcRefresher>();
+        services.AddSingleton<RedisSessionStore>();
 
         var proxyOptions = services.GetOptions<OAuthProxyOptions>(OAuthProxyOptions.SectionName);
 
@@ -27,7 +28,6 @@ public static class OauthProxyExtension
                 cookie.Cookie.Name = "keycloak.cookie";
                 cookie.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 // cookie.SlidingExpiration = true;
-                cookie.SessionStore = new RedisSessionStore(services);
             })
             .AddOpenIdConnect(options =>
             {
@@ -68,6 +68,7 @@ public static class OauthProxyExtension
             });
 
         services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
+            .Configure<RedisSessionStore>((cookieOptions, store) => cookieOptions.SessionStore = store)
             .Configure<CookieOidcRefresher>((cookieOptions, refresher) =>
             {
                 cookieOptions.Events.OnValidatePrincipal = context =>

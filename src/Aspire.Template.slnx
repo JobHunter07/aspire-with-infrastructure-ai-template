@@ -10,4 +10,5 @@
       <Deploy />
     </Project>
   </Folder>
+  <Project Path="Tests/Tests.csproj" Id="b2fff985-9fb5-4447-a145-0a17e5af7f02" />
 </Solution>

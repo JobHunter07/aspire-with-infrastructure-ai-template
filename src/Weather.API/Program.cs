@@ -13,17 +13,20 @@ builder.Services.AddProblemDetails();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+var oidcAuthority = builder.Configuration["Oidc:Authority"]
+    ?? throw new InvalidOperationException("Oidc:Authority configuration is required.");
+
 builder.Services
     .AddAuthentication()
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:9999/realms/aspire-template-dev";  //ToDo:kbdavis07: Get from Config settings
-        options.RequireHttpsMetadata = false;
+        options.Authority = oidcAuthority;
+        options.RequireHttpsMetadata = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             ValidAudiences = ["account"],
-            ValidIssuers = ["https://localhost:9999/realms/aspire-template-dev"]
+            ValidIssuers = [oidcAuthority]
         };
     });
 
@@ -57,7 +60,8 @@ api.MapGet("weatherforecast", () =>
     return forecast;
 })
 .CacheOutput(p => p.Expire(TimeSpan.FromSeconds(5)))
-.WithName("GetWeatherForecast");
+.WithName("GetWeatherForecast")
+.RequireAuthorization();
 
 app.MapDefaultEndpoints();
 

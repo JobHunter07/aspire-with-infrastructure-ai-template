@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Mvc;
@@ -7,14 +8,15 @@ namespace Gateway.API.Account;
 
 public static class AccountEndPoints
 {
-    private const string FrontendUrl = "https://localhost:54955";
-
     public static WebApplication MapAccountEndpoints(this WebApplication app)
     {
+        var frontendUrl = app.Configuration["FrontendUrl"]
+            ?? throw new InvalidOperationException("FrontendUrl configuration is required.");
+
         // Root entry point: requires authentication.
         // Unauthenticated users are automatically challenged via OIDC; after login
         // the OIDC handler returns them here and they are redirected to the frontend.
-        app.MapGet("/", () => Results.Redirect(FrontendUrl))
+        app.MapGet("/", () => Results.Redirect(frontendUrl))
             .WithName("FrontendRoot")
             .WithTags("Account")
             .RequireAuthorization();
@@ -42,22 +44,28 @@ public static class AccountEndPoints
             .WithTags("Account")
             .AllowAnonymous();
 
-        // Info requires authentication and returns the user's claims
+        // Info requires authentication and returns only the required user fields
         api.MapGet("/account/info", (HttpContext http) =>
         {
-            var claims = http.User?.Claims
-                .Select(c => (object)new { c.Type, c.Value })
-                .ToList() ?? new List<object>();
+            var user = http.User;
+            if (user?.Identity?.IsAuthenticated != true)
+                return Results.Unauthorized();
 
-            return Results.Ok(claims);
+            return Results.Ok(new
+            {
+                username = user.FindFirst("preferred_username")?.Value,
+                email = user.FindFirst(ClaimTypes.Email)?.Value,
+                roles = user.FindAll("roles").Select(c => c.Value)
+            });
         })
-        .Produces<IEnumerable<object>>(StatusCodes.Status200OK)
+        .Produces<object>(StatusCodes.Status200OK)
+        .Produces(StatusCodes.Status401Unauthorized)
         .WithName("AccountInfo")
         .WithTags("Account")
         .RequireAuthorization();
 
         // Logout signs out from OIDC and cookie schemes and redirects to the public page
-        api.MapGet("/account/logout", async (HttpContext http) =>
+        api.MapPost("/account/logout", async (HttpContext http) =>
         {
             var prop = new AuthenticationProperties
             {

@@ -17,12 +17,15 @@ builder.Services.AddReverseProxy(builder.Configuration);
 builder.Services.AddOAuthProxy();
 builder.Services.AddAuthorizationPolicies();
 
+var frontendUrl = builder.Configuration["FrontendUrl"]
+    ?? throw new InvalidOperationException("FrontendUrl configuration is required.");
+
 const string corsPolicy = "defaultCorsPolicy";
 builder.Services.AddCors(options => options.AddPolicy(corsPolicy,
-    configurePolicy => configurePolicy                                                           
-        .WithOrigins("http://localhost:4200", "https://localhost:7285", "http://localhost:8080", "https://localhost:54955") //ToDo:kbdavis07: Use Env var's for this
-        .AllowAnyMethod()
-        .AllowAnyHeader()
+    configurePolicy => configurePolicy
+        .WithOrigins(frontendUrl)
+        .WithMethods("GET", "POST", "OPTIONS")
+        .WithHeaders("Content-Type", "Authorization")
         .AllowCredentials()));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

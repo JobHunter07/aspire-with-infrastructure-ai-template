@@ -1,19 +1,28 @@
 ---
-description: Propose a new change - create it and generate all artifacts in one step
+description: Propose a new change - create all artifacts and implement via Test-Driven Development
 ---
 
-Propose a new change - create the change and generate all artifacts in one step.
+Propose a new change - create artifacts, then implement using strict TDD (Red → Green → Refactor).
 
 I'll create a change with artifacts:
 - proposal.md (what & why)
 - design.md (how)
 - tasks.md (implementation steps)
 
-When ready to implement, run /opsx:apply
+Then implement each task following the TDD loop:
+1. Derive Acceptance Tests from spec.md files
+2. Pick one test → Write it (Red) → Make it pass (Green) → Refactor → Repeat
 
 ---
 
 **Input**: The argument after `/opsx:propose` is the change name (kebab-case), OR a description of what the user wants to build.
+
+**References**
+- https://martinfowler.com/bliki/TestDrivenDevelopment.html
+- https://tidyfirst.substack.com/p/canon-tdd
+- https://www.jamesshore.com/v2/projects/lets-play-tdd
+
+---
 
 **Steps**
 
@@ -77,13 +86,74 @@ When ready to implement, run /opsx:apply
    openspec status --change "<name>"
    ```
 
-**Output**
+6. **Bootstrap the test project (if one does not exist)**
 
-After completing all artifacts, summarize:
-- Change name and location
-- List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run `/opsx:apply` to start implementing."
+   A solution must have exactly **one** test project. Check the `.slnx` or `.sln` file for any existing `*.Tests.csproj`.
+
+   If no test project exists:
+   - Create `src/Tests/Tests.csproj` targeting the same `net*` TFM as the other projects
+   - Add xUnit, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, and `coverlet.collector` package refs
+   - Add the project to the solution file
+   - Add project references for each API project that will be tested
+
+   Test project conventions:
+   - **One test project** per solution — all test types live inside it
+   - Use `[Trait("Category", "Acceptance")]` for acceptance tests
+   - Use `[Trait("Category", "Unit")]` for unit tests
+   - Mirror the source folder structure: `src/Tests/Acceptance/`, `src/Tests/Unit/`
+
+7. **Derive the full Acceptance Test list from spec.md files**
+
+   For each `specs/<feature>/spec.md` file under the change directory:
+   - Read the spec in full
+   - Enumerate every acceptance criterion, behaviour, and rule into a test case list
+   - Format as:
+     ```
+     [ ] <FeatureName>: <short description of expected behaviour>
+     ```
+   - Print the complete list before writing any tests — this is the master TDD backlog
+
+8. **TDD Loop — run autopilot until all acceptance tests pass**
+
+   Process tests one at a time in the following cycle. **Do not pause or ask for permission between iterations.**
+
+   ```
+   PICK   → choose the next unchecked acceptance test from the list
+   RED    → write the xUnit test method; run tests; confirm it fails (compile error or assertion failure counts as Red)
+   GREEN  → write the minimum production code to make that one test pass; run tests; confirm green
+   REFACTOR → improve code clarity/structure without changing behaviour; run tests; confirm still green
+   UPDATE → mark the test [x] in the backlog list; proceed to PICK
+   ```
+
+   **RED phase rules**
+   - Write the test in `src/Tests/Acceptance/<Feature>Tests.cs`
+   - Class: `<Feature>AcceptanceTests`, method: `<BehaviourDescription>_<ExpectedOutcome>()`
+   - Decorate with `[Fact]` (or `[Theory]` + `[InlineData]` for parameterised cases)
+   - Decorate with `[Trait("Category", "Acceptance")]`
+   - Test must fail before production code is written — if it passes immediately, the test is wrong; fix it first
+
+   **GREEN phase rules**
+   - Write only the code required to pass the current failing test — no extra logic
+   - Do not fix other failing tests in this step
+   - Run: `dotnet test --filter "Category=Acceptance"` and verify only the target test turns green
+
+   **REFACTOR phase rules**
+   - Remove duplication, rename for clarity, extract small helpers within the same feature file
+   - Do NOT introduce new shared `utils/` or `helpers/` folders (per project convention)
+   - Run tests again after every refactor to confirm nothing regressed
+
+   **Backlog update rules**
+   - After each GREEN+REFACTOR cycle update the in-memory or written backlog list: `[ ]` → `[x]`
+   - If implementing a test reveals a new scenario, append it to the list before continuing
+   - Continue until every test in the list is marked `[x]`
+
+9. **Final verification**
+
+   After all acceptance tests are green:
+   ```bash
+   dotnet test --filter "Category=Acceptance"
+   ```
+   All tests must pass. Show the summary output.
 
 **Artifact Creation Guidelines**
 

@@ -100,6 +100,7 @@ internal sealed class CookieOidcRefresher(IOptionsMonitor<OpenIdConnectOptions> 
             new() { Name = "id_token", Value = message.IdToken },
             new() { Name = "token_type", Value = message.TokenType },
             new() { Name = "expires_at", Value = expiresAt.ToString("o", CultureInfo.InvariantCulture) },
+            new() { Name = "refresh_token", Value = message.RefreshToken ?? validateContext.Properties.GetTokenValue("refresh_token")! },
         ]);
         logger.LogInformation("Token has been refreshed");
     }

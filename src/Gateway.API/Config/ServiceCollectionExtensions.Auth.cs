@@ -26,7 +26,9 @@ public static class OauthProxyExtension
             {
                 //Sets the cookie name and max-age, so the cookie is invalidated.
                 cookie.Cookie.Name = "keycloak.cookie";
-                cookie.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                cookie.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                cookie.Cookie.HttpOnly = true;
+                cookie.Cookie.SameSite = SameSiteMode.Strict;
                 // cookie.SlidingExpiration = true;
             })
             .AddOpenIdConnect(options =>
@@ -34,8 +36,8 @@ public static class OauthProxyExtension
                 //Use default signin scheme
                 options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
-                options.Authority = proxyOptions.Authority; //ToDo:kbdavis07: Use Env Var for base URI: KEYCLOAK_HTTPS
-                options.RequireHttpsMetadata = false;
+                options.Authority = proxyOptions.Authority;
+                options.RequireHttpsMetadata = true;
 
                 options.ClientId = proxyOptions.ClientId;
                 options.ClientSecret = proxyOptions.ClientSecret;

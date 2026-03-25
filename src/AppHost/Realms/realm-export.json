@@ -672,7 +672,7 @@
     },
     {
       "id": "673f38e0-0e11-4e73-bc17-2d29c7364f2e",
-      "clientId": "gateway",
+      "clientId": "gatewayhost",
       "name": "Gateway Host",
       "description": "BFF + API",
       "rootUrl": "https://localhost:7415",

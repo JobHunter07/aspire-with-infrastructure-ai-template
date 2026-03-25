@@ -1,3 +1,5 @@
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
@@ -10,6 +12,22 @@ builder.Services.AddProblemDetails();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services
+    .AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://localhost:9999/realms/aspire-template-dev";  //ToDo:kbdavis07: Get from Config settings
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidAudiences = ["account"],
+            ValidIssuers = ["https://localhost:9999/realms/aspire-template-dev"]
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

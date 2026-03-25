@@ -59,8 +59,12 @@ public static class OauthProxyExtension
                     NameClaimType = "preferred_username",
                     RoleClaimType = "roles"
                 };
-                options.CallbackPath = "/signin-oidc";
+                options.CallbackPath = "/bff/callback";
                 options.SaveTokens = true;
+                // Disable Pushed Authorization Requests (PAR) - Keycloak rejects the redirect_uri
+                // when PAR is used because the full callback URI must exactly match a registered URI.
+                // Set to Disable to use the standard authorization code flow redirect instead.
+                options.PushedAuthorizationBehavior = PushedAuthorizationBehavior.Disable;
             });
 
         services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)

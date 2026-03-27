@@ -1,6 +1,6 @@
 namespace Tests.Acceptance.Playwright;
 
-internal sealed record ScreenshotResult(
+public sealed record ScreenshotResult(
     string TestName,
     string Spec,
     string Scenario,
